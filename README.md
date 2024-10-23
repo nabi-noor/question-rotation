@@ -1,85 +1,78 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Dynamic Question Assignment System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
+This project implements a dynamic question assignment system using NestJS, TypeORM, Redis, and MySQL. The system assigns questions to users based on their geographical region and a configurable cycle duration. The application is designed to handle scalability for thousands of daily active users (DAU) while ensuring efficient question retrieval and assignment.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Problem Statement
+The goal is to create a question rotation system where:
+- Questions are assigned based on a weekly cycle.
+- Each region receives a specific set of questions.
+- The duration of each cycle is configurable.
 
-## Description
+## Dependencies
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 1. NestJS
+- **Description:** A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
+- **Installation:** 
+    ```bash
+    npm install @nestjs/core @nestjs/common @nestjs/platform-express
+    ```
 
-## Project setup
+### 2. TypeORM
+- **Description:** An ORM for TypeScript and JavaScript (ES7, ES6, ES5) that supports various SQL databases, including MySQL.
+- **Installation:** 
+    ```bash
+    npm install @nestjs/typeorm typeorm mysql2
+    ```
 
-```bash
-$ npm install
-```
+### 3. Redis Cache
+- **Description:** Redis is an in-memory data structure store, used as a database, cache, and message broker.
+- **Installation:** 
+    ```bash
+    npm install @nestjs/cache-manager cache-manager-redis-store
+    ```
 
-## Compile and run the project
+### 4. Schedule Module
+- **Description:** A module to schedule tasks in your application (e.g., question assignments).
+- **Installation:**
+    ```bash
+    npm install @nestjs/schedule
+    ```
 
-```bash
-# development
-$ npm run start
+## Solution Overview
+The architecture of this application consists of several modules:
 
-# watch mode
-$ npm run start:dev
+- **Question Module:** Responsible for managing questions and their assignments to regions.
+- **Region Module:** Handles different user regions and their specific question sets.
+- **Cycle Module:** Manages the configuration of the question assignment cycles.
+- **Question Assignment Module:** Contains logic to assign questions to users based on the defined cycles and regions.
+- **Cron Service:** Used to execute scheduled tasks for question assignment.
 
-# production mode
-$ npm run start:prod
-```
+The caching layer uses Redis to store the currently assigned question for each region, improving performance by reducing database queries.
 
-## Run tests
+### Key Features
+- Configurable question assignment cycles.
+- Caching for efficient question retrieval.
+- Region-specific question sets.
+- Scalable design to accommodate thousands of users.
 
-```bash
-# unit tests
-$ npm run test
+## API Endpoints
 
-# e2e tests
-$ npm run test:e2e
+### 1. Get Current Question for Region
+- **Endpoint:** `GET /questions/current`
+- **Description:** Fetches the current question assigned to the specified region.
+- **Query Parameters:**
+  - `regionId` (number): The ID of the region for which to fetch the question.
+- **Response:**
+  ```json
+  {
+    "id": 1,
+    "text": "What is the capital of Singapore?",
+    "regionId": 1,
+    "assignedAt": "2023-10-23T19:00:00Z"
+  }
 
-# test coverage
-$ npm run test:cov
-```
 
-## Resources
+npm install
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+npm run start
